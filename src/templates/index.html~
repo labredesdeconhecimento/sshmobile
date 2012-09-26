@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>IP:
+        <dd><input type=text size=30 name=ip>
+        
+        <dt>Port:
+        <dd><input type=text size=30 name=port>
+        
+        <dt>User:
+        <dd><input type=text size=30 name=user>
+        
+        <dt>Password:
+        <dd><input type=password size=30 name=password>
+        
+        <dd><input type=submit value=Connect>
+      </dl>
+    </form>
+  {% endif %}
+
+  <ul class=entries>
+  {% for entry in entries %}
+    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
+  {% else %}
+    <li><em>Unbelievable. No entries here so far</em>
+  {% endfor %}
+  </ul>
+  
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+  
+    <ul class=entries>
+    {% for entry in entries %}
+      <li><h2>{{ entry }}</h2>
+    {% endfor %}
+    </ul>
+
+  {% endif %}
+
+{% endblock %}
