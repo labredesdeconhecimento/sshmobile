@@ -4,16 +4,19 @@
     <form action="{{ url_for('ssh_session') }}" method=post class=add-entry>
       <dl>
         <dt>IP:
-        <dd><input type=text size=30 name=ip>
+        <dd><input type=text size=30 name=ip value={{ values['ip'] }}>
         
         <dt>Port:
-        <dd><input type=text size=30 name=port>
+        <dd><input type=text size=30 name=port value={{ values['port'] }}>
         
         <dt>User:
-        <dd><input type=text size=30 name=user>
+        <dd><input type=text size=30 name=user value={{ values['user'] }}>
         
         <dt>Password:
         <dd><input type=password size=30 name=password>
+        
+        <dt>Command:
+        <dd><input type=text size=30 name=command value={{ values['command'] }}>
         
         <dd><input type=submit value=Connect>
       </dl>

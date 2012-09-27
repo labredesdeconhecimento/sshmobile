@@ -59,16 +59,22 @@ def teardown_request(exception):
 def index():
     if not session.get('logged_in'):
         abort(401)
-    return render_template('index.html')
+    return render_template('index.html', values="")
 
 @app.route('/ssh', methods=['POST'])
 def ssh_session():
     if not session.get('logged_in'):
         abort(401)
 
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect('localhost', username='francisco', password='thiene')
-    stdin, stdout, stderr = ssh.exec_command('ls')
+    try:
+        data = request.form
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(data['ip'], username=data['user'], password=data['password'], port=int(data['port']))
+        stdin, stdout, stderr = ssh.exec_command(data['command'])
+    except Exception:
+        flash('Error while trying to open remote conection. Please, check the inputs.')
+        return render_template('index.html', values=data)
     
     return render_template('ssh.html', entries=stdout.readlines())
 
