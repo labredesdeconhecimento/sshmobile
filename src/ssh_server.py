@@ -59,7 +59,7 @@ def teardown_request(exception):
 def index():
     if not session.get('logged_in'):
         abort(401)
-    return render_template('index.html', values="")
+    return render_template('index.html', values=session.get('data'))
 
 @app.route('/ssh', methods=['POST', 'GET'])
 def ssh_session():
@@ -67,6 +67,9 @@ def ssh_session():
         abort(401)
 
     try:
+        ''' Stores de form data, in case of the user clicks the link back on the next page '''
+        session['data'] = request.form    
+
         data = request.form
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
