@@ -1,13 +1,20 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
-  
-    <ul class=entries>
-    {% for entry in entries %}
-      <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
-    {% endfor %}
-    </ul>
 
+   <a href="{{ url_for('index') }}" data-role="button" data-inline="true" 
+              data-theme="a" data-mini="true" data-icon="arrow-l">Back</a>
+   
+   
+   <div data-role="collapsible" data-theme="b" data-content-theme="c">
+     <h3>Server return</h3>
+     <ul data-role="listview" data-inset="true" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        {% for entry in entries %}
+          <li class="ui-li ui-li-static ui-body-c ui-corner-top">{{ entry }}</li>
+        {% endfor %}
+      </ul>
+   </div>
+   
   {% endif %}
 
 {% endblock %}
