@@ -5,10 +5,10 @@
    <a href="{{ url_for('index') }}" data-role="button" data-inline="true" 
               data-theme="a" data-mini="true" data-icon="arrow-l">Back</a>
    
-   
-   <div data-role="collapsible" data-theme="b" data-content-theme="c">
+   <div data-role="collapsible" data-theme="b" data-content-theme="c" data-collapsed="false">
      <h3>Returned by the remote server</h3>
-     <ul data-role="listview" data-inset="true" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+     <ul data-role="listview" data-inset="true" style="word-wrap: break-word" 
+                            class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
         {% for entry in entries %}
           <li class="ui-li ui-li-static ui-body-c ui-corner-top">{{ entry }}</li>
         {% endfor %}
