@@ -13,6 +13,7 @@ from contextlib import closing
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 import paramiko
+import hashlib
 
 # configuration
 DATABASE = 'database.db'
@@ -41,13 +42,11 @@ def before_request():
     """Make sure we are connected to the database each request."""
     g.db = connect_db()
 
-
 @app.teardown_request
 def teardown_request(exception):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'db'):
         g.db.close()
-
 
 #@app.route('/')
 #def show_entries():
@@ -81,18 +80,13 @@ def ssh_session():
     
     return render_template('ssh.html', entries=stdout.readlines())
 
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
-
     if request.method == 'POST':
-        
         cur = g.db.execute('select username, encrypted_password from users')
         user = cur.fetchall()[0]
-      
   
-  
-        if request.form['username'] != user[0] or request.form['password'] != str(user[1]):
+        if request.form['username'] != user[0] or encrypt(request.form['password']) != user[1]:
             flash('Invalid username or password!')
         else:
             session['logged_in'] = True
@@ -100,13 +94,14 @@ def login():
             return redirect(url_for('index'))
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return render_template('login.html')
 
+def encrypt(password):
+    return hashlib.sha512(password).hexdigest()
 
 if __name__ == '__main__':
     init_db()
