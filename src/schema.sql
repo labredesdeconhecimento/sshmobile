@@ -1,6 +1,8 @@
-drop table if exists entries;
-create table entries (
+drop table if exists users;
+create table users (
   id integer primary key autoincrement,
-  title string not null,
-  text string not null
+  username string not null,
+  encrypted_password string not null
 );
+
+insert into users (username, encrypted_password) values ("admin", "123");

@@ -3,6 +3,9 @@
 sshmobile
 ~~~~~~~~~
 
+Allows the user to run a remote command on his 
+server (ssh server) from the smartphone
+
 """
 from __future__ import with_statement
 from sqlite3 import dbapi2 as sqlite3
@@ -15,8 +18,6 @@ import paramiko
 DATABASE = 'database.db'
 DEBUG = True
 SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = '123456'
 
 # initialize the application
 app = Flask(__name__)
@@ -34,7 +35,6 @@ def init_db():
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
         db.commit()
-
 
 @app.before_request
 def before_request():
@@ -84,9 +84,15 @@ def ssh_session():
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    error = None
+
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME'] or request.form['password'] != app.config['PASSWORD']:
+        
+        cur = g.db.execute('select username, encrypted_password from users')
+        user = cur.fetchall()[0]
+      
+  
+  
+        if request.form['username'] != user[0] or request.form['password'] != str(user[1]):
             flash('Invalid username or password!')
         else:
             session['logged_in'] = True
