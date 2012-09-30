@@ -7,6 +7,7 @@ Allows the user to run a remote command on his
 server (ssh server) from the smartphone
 
 """
+
 from __future__ import with_statement
 from sqlite3 import dbapi2 as sqlite3
 from contextlib import closing
@@ -66,19 +67,21 @@ def ssh_session():
         abort(401)
 
     try:
-        ''' Stores de form data, in case of the user clicks the link back on the next page '''
+        ''' Stores the form data, in case of the user clicks the link back on the next page '''
         session['data'] = request.form    
 
         data = request.form
-        ssh = paramiko.SSHClient()
+        ssh = MySSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(data['ip'], username=data['user'], password=data['password'], port=int(data['port']))
-        stdin, stdout, stderr = ssh.exec_command(data['command'])
+        ssh.connect(data['ip'], username=data['user'], password=data['password'], port=int(data['port']), timeout=600)
+        stdin, stdout, stderr = ssh.exec_command(data['command'], timeout=1)
+        entries = stdout.readlines()
+        ssh.close()
     except Exception:
         flash('Error while trying to open remote conection. Please, check the inputs.')
         return render_template('index.html', values=data)
     
-    return render_template('ssh.html', entries=stdout.readlines())
+    return render_template('ssh.html', entries=entries)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -106,6 +109,17 @@ def encrypt(password):
 @app.route('/favicon.ico')
 def get_favicon():
     return send_file('static/favicon.ico', mimetype='image/png')
+    
+class MySSHClient(paramiko.SSHClient): 
+    ## overload the exec_command method 
+    def exec_command(self, command, bufsize=100, timeout=None): 
+        chan = self._transport.open_session() 
+        chan.settimeout(timeout) 
+        chan.exec_command(command) 
+        stdin = chan.makefile('wb', bufsize) 
+        stdout = chan.makefile('rb', bufsize) 
+        stderr = chan.makefile_stderr('rb', bufsize) 
+        return stdin, stdout, stderr 
 
 if __name__ == '__main__':
     init_db()

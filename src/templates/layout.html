@@ -21,8 +21,8 @@
 
       <div data-role="content" class="ui-content">	
         {% for message in get_flashed_messages() %}
-          <div class="ui-bar ui-bar-b">
-	          <h3>{{ message }}</h3>
+          <div class="ui-bar ui-bar-d" style="margin-bottom: 5px;">
+	          <h3 class="error_message">{{ message }}</h3>
           </div>
 
         {% endfor %}
