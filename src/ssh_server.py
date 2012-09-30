@@ -11,7 +11,7 @@ from __future__ import with_statement
 from sqlite3 import dbapi2 as sqlite3
 from contextlib import closing
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash
+     render_template, flash, send_file
 import paramiko
 import hashlib
 
@@ -102,6 +102,10 @@ def logout():
 
 def encrypt(password):
     return hashlib.sha512(password).hexdigest()
+    
+@app.route('/favicon.ico')
+def get_favicon():
+    return send_file('static/favicon.ico', mimetype='image/png')
 
 if __name__ == '__main__':
     init_db()
