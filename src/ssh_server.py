@@ -14,6 +14,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, send_file
 import paramiko
 import hashlib
+import os
 
 # configuration
 DATABASE = 'database.db'
@@ -92,4 +93,5 @@ class MySSHClient(paramiko.SSHClient):
         return stdin, stdout, stderr 
 
 if __name__ == '__main__':
-    app.run(app.config.get('SERVER_NAME'), app.config.get('SERVER_PORT'))
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
