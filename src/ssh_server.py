@@ -92,4 +92,4 @@ class MySSHClient(paramiko.SSHClient):
         return stdin, stdout, stderr 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(app.config.get('SERVER_NAME'), app.config.get('SERVER_PORT'))
