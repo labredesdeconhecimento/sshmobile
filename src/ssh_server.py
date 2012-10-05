@@ -9,7 +9,6 @@ server (ssh server) from the smartphone
 """
 
 from __future__ import with_statement
-from sqlite3 import dbapi2 as sqlite3
 from contextlib import closing
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, send_file
@@ -21,39 +20,13 @@ DATABASE = 'database.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 
+username = 'admin'
+encrypted_password = '3c9909afec25354d551dae21590bb26e38d53f2173b8d3dc3eee4c047e7ab1c1eb8b85103e3be7ba613b31bb5c9c36214dc9f14a42fd7a2fdb84856bca5c44c2'
+
 # initialize the application
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
-def connect_db():
-    """Returns a new connection to the database."""
-    return sqlite3.connect(app.config['DATABASE'])
-
-
-def init_db():
-    """Creates the database tables."""
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-@app.before_request
-def before_request():
-    """Make sure we are connected to the database each request."""
-    g.db = connect_db()
-
-@app.teardown_request
-def teardown_request(exception):
-    """Closes the database again at the end of the request."""
-    if hasattr(g, 'db'):
-        g.db.close()
-
-#@app.route('/')
-#def show_entries():
-#    cur = g.db.execute('select title, text from entries order by id desc')
-#    entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
-#    return render_template('show_entries.html', entries=entries)
 
 @app.route('/index')
 def index():
@@ -86,10 +59,7 @@ def ssh_session():
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        cur = g.db.execute('select username, encrypted_password from users')
-        user = cur.fetchall()[0]
-  
-        if request.form['username'] != user[0] or encrypt(request.form['password']) != user[1]:
+        if request.form['username'] != username or encrypt(request.form['password']) != encrypted_password:
             flash('Invalid username or password!')
         else:
             session['logged_in'] = True
@@ -122,5 +92,4 @@ class MySSHClient(paramiko.SSHClient):
         return stdin, stdout, stderr 
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0')
