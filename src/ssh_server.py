@@ -15,6 +15,10 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 import paramiko
 import hashlib
 import os
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+#from yourapplication import app
 
 # configuration
 DATABASE = 'database.db'
@@ -91,7 +95,15 @@ class MySSHClient(paramiko.SSHClient):
         stdout = chan.makefile('rb', bufsize) 
         stderr = chan.makefile_stderr('rb', bufsize) 
         return stdin, stdout, stderr 
+        
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 443))
+    
+    http_server = HTTPServer(WSGIContainer(app), ssl_options={
+        "certfile": "certificate.pem",
+        "keyfile": "privatekey.pem",
+    })
+    
+    http_server.listen(port)
+    IOLoop.instance().start()
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
